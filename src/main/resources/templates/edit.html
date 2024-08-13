@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Reservation</title>
+  <link rel="stylesheet" href="/webjars/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+  <h1>Edit Reservation</h1>
+  <form th:action="@{/edit}" method="post">
+    <input type="hidden" name="id" th:value="${seat.id}" />
+    <div class="mb-3">
+      <label for="transactionCode" class="form-label">Transaction Code</label>
+      <input type="text" class="form-control" id="transactionCode" name="transactionCode" th:value="${seat.id}" required>
+    </div>
+    <div class="mb-3">
+      <label for="seatNum" class="form-label">Seat Number</label>
+      <input type="text" class="form-control" id="seatNum" name="seatNum" th:value="${seat.seatNum}" required>
+    </div>
+    <div class="mb-3">
+      <label for="customerName" class="form-label">Customer Name</label>
+      <input type="text" class="form-control" id="customerName" name="customerName" th:value="${seat.name}" required>
+    </div>
+    <div class="mb-3">
+      <label for="transactionDate" class="form-label">Transaction Date</label>
+      <input type="date" class="form-control" id="transactionDate" name="transactionDate" th:value="${#dates.format(seat.dot, 'yyyy-MM-dd')}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+<script src="/webjars/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

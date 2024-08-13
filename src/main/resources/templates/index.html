@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seat Reservation System</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        .green-table {
+            background-color: green;
+            color: white;
+        }
+        .gray-table {
+            background-color: gray;
+            color: white;
+        }
+        .pre-scrollable {
+            height: 500px;
+            overflow-y: scroll;
+        }
+        h1 {
+            text-align: center;
+        }
+        .center-text {
+            text-align: center;
+        }
+        .mb-5 {
+            margin-bottom: 3rem;
+        }
+        .green-background {
+            background-color: green;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<h1>Seat Reservation System</h1>
+<div class="container">
+    <table class="table table-bordered green-table">
+        <thead>
+        <tr>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+            <th>D</th>
+            <th>E</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:text="${seatMap['1A']} ?: '1A'"></td>
+            <td th:text="${seatMap['1B']} ?: '1B'"></td>
+            <td th:text="${seatMap['1C']} ?: '1C'"></td>
+            <td th:text="${seatMap['1D']} ?: '1D'"></td>
+            <td th:text="${seatMap['1E']} ?: '1E'"></td>
+        </tr>
+        <tr>
+            <td th:text="${seatMap['2A']} ?: '2A'"></td>
+            <td th:text="${seatMap['2B']} ?: '2B'"></td>
+            <td th:text="${seatMap['2C']} ?: '2C'"></td>
+            <td th:text="${seatMap['2D']} ?: '2D'"></td>
+            <td th:text="${seatMap['2E']} ?: '2E'"></td>
+        </tr>
+        <tr>
+            <td th:text="${seatMap['3A']} ?: '3A'"></td>
+            <td th:text="${seatMap['3B']} ?: '3B'"></td>
+            <td th:text="${seatMap['3C']} ?: '3C'"></td>
+            <td th:text="${seatMap['3D']} ?: '3D'"></td>
+            <td th:text="${seatMap['3E']} ?: '3E'"></td>
+        </tr>
+        <tr>
+            <td th:text="${seatMap['4A']} ?: '4A'"></td>
+            <td th:text="${seatMap['4B']} ?: '4B'"></td>
+            <td th:text="${seatMap['4C']} ?: '4C'"></td>
+            <td th:text="${seatMap['4D']} ?: '4D'"></td>
+            <td th:text="${seatMap['4E']} ?: '4E'"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="green-background center-text">
+        <p>There are <span th:text="${remainingSeats}"></span> remaining seats.</p>
+    </div>
+    <form th:action="@{/reserve}" method="post" class="green-background center-text mb-5" onsubmit="return validateForm()">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="seatCode" class="form-label">Seat Code</label>
+                <input type="text" class="form-control" id="seatCode" name="seatCode" required>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="customerName" class="form-label">Customer Name</label>
+                <input type="text" class="form-control" id="customerName" name="customerName" required>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="transactionDate" class="form-label">Transaction Date</label>
+                <input type="date" class="form-control" id="transactionDate" name="transactionDate" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Reserve</button>
+    </form>
+    <div th:if="${error}" class="alert alert-danger" role="alert" style="display: none;">
+        <p th:text="${error}"></p>
+    </div>
+    <div th:if="${message}" class="alert alert-success" role="alert" style="display: none;">
+        <p th:text="${message}"></p>
+    </div>
+    <table class="table table-bordered gray-table">
+        <thead>
+        <tr>
+            <th>Transaction Code</th>
+            <th>Name</th>
+            <th>Seat Number</th>
+            <th>Date of Travel</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="seat : ${listSeats}">
+            <td th:text="${seat.id}"></td>
+            <td th:text="${seat.name}"></td>
+            <td th:text="${seat.seatNum}"></td>
+            <td th:text="${#dates.format(seat.dot, 'yyyy-MM-dd')}"></td>
+            <td>
+                <form th:action="@{/delete}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this seat?');">
+                    <input type="hidden" name="id" th:value="${seat.id}" />
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <form th:action="@{/edit}" method="get" style="display:inline;">
+                    <input type="hidden" name="id" th:value="${seat.id}" />
+                    <button type="submit" class="btn btn-warning">Edit</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('transactionDate').value = today;
+    });
+
+    function validateForm() {
+        const seatCode = document.getElementById('seatCode').value;
+        const validSeatPattern = /^[1-4][A-E]$/;
+        if (!seatCode || !validSeatPattern.test(seatCode)) {
+            alert('Please enter a valid seat number.');
+            return false;
+        }
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const errorMessage = /*[[${error}]]*/ '[(${error})]';
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+        const successMessage = /*[[${message}]]*/ '[(${message})]';
+        if (successMessage) {
+            alert(successMessage);
+        }
+    });
+</script>
+<script src="/webjars/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
